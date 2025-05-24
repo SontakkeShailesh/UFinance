@@ -15,14 +15,14 @@ public class GlobalException {
     }
 
     @ExceptionHandler(ResouceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleResouceNotFoundException(ResouceNotFoundException ex)
+    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResouceNotFoundException ex)
     {
         ErrorResponse err = new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
         return new ResponseEntity<>(err, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> gandleGenericException(Exception ex)
+    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex)
     {
         ErrorResponse err = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage());
         return new ResponseEntity<>(err, HttpStatus.INTERNAL_SERVER_ERROR);

@@ -2,6 +2,7 @@ package com.manager.Controller;
 
 import com.manager.DTO.SavingRequestDto;
 import com.manager.DTO.SavingResponseDto;
+import com.manager.Exceptions.ResouceNotFoundException;
 import com.manager.Service.SavingService.SavingServiceImpl;
 import com.manager.entity.Saving;
 import jakarta.validation.Valid;
@@ -46,9 +47,9 @@ public class SavingController {
     }
 
     @GetMapping("/income/date/{date}")
-    public ResponseEntity<Saving>  dateResult(@PathVariable LocalDate date)
+    public ResponseEntity<List<Saving>>  dateResult(@PathVariable LocalDate date)
     {
-        Saving saving = savingService.searchByDate(date);
+        List<Saving> saving = savingService.searchByDate(date);
         return new ResponseEntity<>(saving, HttpStatus.OK);
     }
 

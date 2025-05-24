@@ -21,18 +21,18 @@ public interface TransactionRepo extends JpaRepository<Transaction, Long> {
 
     Optional<List<Transaction>> findByType(String type);
 
-    Optional<List<Transaction>> findByCategory(String category);
+    Optional<List<Transaction>> findByTypeAndCategory(String type, String category);
 
-    Optional<List<Transaction>> findByDate(LocalDate date);
+    Optional<List<Transaction>> findByTypeAndDate(String type, LocalDate date);
 
-    Optional<List<Transaction>> findByAmount(Long amount);
+    Optional<List<Transaction>> findByTypeAndAmount(String type, Long amount);
 
     List<Transaction> findByIdGreaterThan(Long id);
 
-    //Transaction findTopByOrderByIdDesc();
-
     Optional<Transaction> findFirstByIdGreaterThanAndTypeOrderByIdAsc(Long id, String type);
+
     Optional<Transaction> findFirstByIdLessThanAndTypeOrderByIdDesc(Long id, String type);
+
     List<Transaction> findByIdGreaterThanOrderByIdAsc(Long id);
 
 

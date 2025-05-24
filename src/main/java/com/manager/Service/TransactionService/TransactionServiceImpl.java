@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Service
-public class TransactionServiceImpl {
+public class TransactionServiceImpl implements TransactionService{
 
     private TransactionRepo transactionRepo;
     private SavingRepo savingRepo;
@@ -73,43 +73,45 @@ public class TransactionServiceImpl {
 
     public List<Transaction> findAllExpense()
     {
-        return transactionRepo.findAll();
+        List<Transaction> records =  transactionRepo.findByType("Debit").orElse(null);
+        if(records == null) throw new ResouceNotFoundException("No Transactions found");
+        return records;
     }
 
     public Transaction getById(Long id)
     {
         Transaction record = transactionRepo.findById(id).orElse(null);
-        if(record == null) throw new ResouceNotFoundException("No data with id" + id);
+        if(record == null) throw new ResouceNotFoundException("No data with id " + id);
         return record;
     }
 
     public List<Transaction> getByType(String type)
     {
         List<Transaction> records = transactionRepo.findByType(type).orElse(null);
-        if(records == null) throw new ResouceNotFoundException("No data with type" + type);
+        if(records.isEmpty()) throw new ResouceNotFoundException("No data with type " + type);
         return records;
     }
 
     public List<Transaction> getByCategory(String category)
     {
-        List<Transaction> records = transactionRepo.findByCategory(category).orElse(null);
-        if(records == null) throw new ResouceNotFoundException("No data with category" + category);
+        List<Transaction> records = transactionRepo.findByTypeAndCategory("DEBIT", category).orElse(null);
+        if(records.isEmpty()) throw new ResouceNotFoundException("No data with category " + category);
         return records;
     }
 
     public List<Transaction> getByDate(LocalDate date) {
-        List<Transaction> records = transactionRepo.findByDate(date).orElse(null);
-        if(records == null) throw new ResouceNotFoundException("No data with date" + date);
+        List<Transaction> records = transactionRepo.findByTypeAndDate("DEBIT", date).orElse(null);
+        if(records.isEmpty()) throw new ResouceNotFoundException("No data with date " + date);
         return records;
     }
 
     public List<Transaction> getByAmount(Long amount) {
-        List<Transaction> records = transactionRepo.findByAmount(amount).orElse(null);
-        if(records == null) throw new ResouceNotFoundException("No data with amount" + amount);
+        List<Transaction> records = transactionRepo.findByTypeAndAmount("DEBIT", amount).orElse(null);
+        if(records.isEmpty()) throw new ResouceNotFoundException("No data with amount " + amount);
         return records;
     }
 
-    @Transactional //totalExpense after updating first expense records store old value
+    @Transactional
     public TransactionResponseDto updateExpense(Long id, TransactionRequestDto request)
     {
         Transaction expense = transactionRepo.findById(id).orElse(null);
@@ -140,8 +142,8 @@ public class TransactionServiceImpl {
             difference = newAmount - oldAmount;
 
             expense.setAmount(newAmount);
-
             expense.setRemainingIncome(expense.getRemainingIncome() - difference);
+            expense.setTotalExpense(expense.getTotalExpense() + difference);
 
             transactionRepo.save(expense);
 
@@ -153,25 +155,6 @@ public class TransactionServiceImpl {
             }
         }
 
-        // older version of solution to fetch and update remainingIncome and TotalSaving  in saving table
-//        Transaction latestTxn = transactionRepo.findTopByOrderByIdDesc();
-//        if (latestTxn != null) {
-//            Long latestRemainingIncome = latestTxn.getRemainingIncome();
-//
-//            // Step: Fetch latest saving entry
-//            Saving latestSaving = savingRepo.findTopByOrderByIdDesc();
-//            if (latestSaving != null) {
-//                latestSaving.setRemainingIncome(latestRemainingIncome);
-//                latestSaving.setTotalSaving(latestRemainingIncome); // Assuming totalSaving should match
-//                savingRepo.save(latestSaving);
-//            }
-//        }
-
-//  fetch below credit transaction and get savingId from that ans update all records coming below that id, if not then fetch least recent [above]
-
-        //check this
-        //problem1: total_income and total_saving is wrong in saving
-        //prb 2: totalExpense is wrong for first updated record
         Long updateTxnId = id;
         Transaction creditTxn = transactionRepo
                 .findFirstByIdGreaterThanAndTypeOrderByIdAsc(updateTxnId, "CREDITED")
@@ -185,11 +168,11 @@ public class TransactionServiceImpl {
              if (savingId != null) {
                  Long diff = request.getAmount() - keepOldExpense;
 
-                 // Include the current savingId also (not just greater than)
                  List<Saving> savings = savingRepo.findByIdGreaterThanEqualOrderById(savingId);
                  for (Saving s : savings) {
                      s.setRemainingIncome(s.getRemainingIncome() - diff);
                      s.setTotalSaving(s.getTotalSaving() - diff);
+
                  }
                  savingRepo.saveAll(savings);
              }

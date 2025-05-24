@@ -11,7 +11,7 @@ public interface SavingRepo extends JpaRepository<Saving, Long> {
 
     Saving findTopByOrderByIdDesc();
 
-    Optional<Saving> findByDate(LocalDate date);
+    Optional<List<Saving>> findByDate(LocalDate date);
 
     Optional<List<Saving>> findByincomeType(String type);
 

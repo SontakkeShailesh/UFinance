@@ -16,7 +16,7 @@ import java.util.List;
 
 
 @Service
-public class SavingServiceImpl {
+public class SavingServiceImpl implements SavingService {
 
     private SavingRepo savingRepo;
     private TransactionRepo transactionRepo;
@@ -27,7 +27,7 @@ public class SavingServiceImpl {
         this.transactionRepo = transactionRepo;
     }
 
-    public SavingResponseDto addIncome(SavingRequestDto request) // all  good
+    public SavingResponseDto addIncome(SavingRequestDto request)
     {
         Saving lastSaving = savingRepo.findTopByOrderByIdDesc();
 
@@ -66,7 +66,7 @@ public class SavingServiceImpl {
         Transaction tempSavedTxn = transactionRepo.save(creditTransaction); //To fetch expense from saving when its 1st expense
 
         if ("CREDITED".equalsIgnoreCase(creditTransaction.getType())) {
-            // Fetch the most recent DEBIT creditTransaction before this CREDITED one
+
             Transaction lastDebit = transactionRepo
                     .findFirstByIdLessThanAndTypeOrderByIdDesc(creditTransaction.getId(), "DEBIT")
                     .orElse(null);
@@ -74,7 +74,7 @@ public class SavingServiceImpl {
             if (lastDebit != null) {
                 creditTransaction.setTotalExpense(lastDebit.getTotalExpense() != null ? lastDebit.getTotalExpense() : 0L);
             } else {
-                creditTransaction.setTotalExpense(0L); // Default if no previous DEBIT
+                creditTransaction.setTotalExpense(0L);
             }
         }
 
@@ -93,12 +93,12 @@ public class SavingServiceImpl {
         return response;
     }
 
-    public List<Saving> incomeHistory() // all  good
+    public List<Saving> incomeHistory()
     {
         return savingRepo.findAll();
     }
 
-    public Saving searchById(Long id) // all  good
+    public Saving searchById(Long id)
     {
         Saving response = savingRepo.findById(id).orElse(null);
         if(response == null)
@@ -108,9 +108,9 @@ public class SavingServiceImpl {
         return response;
     }
 
-    public Saving searchByDate(LocalDate date) // all  good
+    public List<Saving> searchByDate(LocalDate date)
     {
-        Saving response = savingRepo.findByDate(date).orElse(null);
+        List<Saving> response = (List<Saving>) savingRepo.findByDate(date).orElse(null);
         if(response == null)
         {
             throw new ResouceNotFoundException("No data with date "+ date);
@@ -118,20 +118,20 @@ public class SavingServiceImpl {
         return response;
     }
 
-    public List<Saving> searchByType(String type) // all  good
+    public List<Saving> searchByType(String type)
     {
         List<Saving> response = savingRepo.findByincomeType(type).orElse(null);
-        if(response == null)
+        if(response.isEmpty())
         {
             throw new ResouceNotFoundException("No data with income Type "+ type);
         }
         return response;
     }
 
-    public List<Saving> searchByAmount(Long amount)// all  good
+    public List<Saving> searchByAmount(Long amount)
     {
         List<Saving> response = savingRepo.findByIncome(amount).orElse(null);
-        if(response == null)
+        if(response.isEmpty())
         {
             throw new ResouceNotFoundException("No data with amount "+ amount );
         }
@@ -139,12 +139,12 @@ public class SavingServiceImpl {
     }
 
 
-    public SavingResponseDto updateSaving(Long id, SavingRequestDto request)  // all  good
+    public SavingResponseDto updateSaving(Long id, SavingRequestDto request)
         {
             Saving saving = savingRepo.findById(id).orElse(null);
             if(saving == null)
             {
-                throw new ResouceNotFoundException("Given saving id " + request.getId() + " is not present");
+                throw new ResouceNotFoundException("Given saving id " + id + " is not present");
             }
 
             if(request.getDate() != null)
@@ -193,10 +193,8 @@ public class SavingServiceImpl {
                 Long newIncome = request.getIncome();
                 Long difference = newIncome - keepOldIncome;
 
-                // Update the credited transaction's amount
                 creditedTxn.setAmount(newIncome);
 
-                // Get all transactions having ID >= this one // getting id of transaction table from saving_id
                 List<Transaction> futureTransactions = transactionRepo.findByIdGreaterThanEqualOrderByIdAsc(creditedTxn.getId());
 
                 for (Transaction txn : futureTransactions) {
@@ -231,7 +229,6 @@ public class SavingServiceImpl {
 
         Long subIncome = saving.getIncome(); // Income to subtract from subsequent records
 
-        // First we'll update expense table
         Transaction creditedTxn = transactionRepo.findFirstBySavingIdAndTypeOrderByIdAsc(id, "CREDITED");
         if (creditedTxn == null) {
             throw new RuntimeException("No credited transaction found for saving id " + id);
