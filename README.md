@@ -14,3 +14,4 @@ PoatMan:
 
 ![image](https://github.com/user-attachments/assets/5f4db8d8-ec4e-42e3-a614-1bdf36bbd39a)
 
+New version with frontend improvements and additional features in progress.
