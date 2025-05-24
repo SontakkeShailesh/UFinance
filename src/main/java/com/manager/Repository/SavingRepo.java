@@ -19,4 +19,11 @@ public interface SavingRepo extends JpaRepository<Saving, Long> {
 
     List<Saving> findByIdGreaterThanOrderById(Long id);
 
+    List<Saving> findByIdGreaterThanEqualOrderByIdAsc(Long id);
+
+    List<Saving> findByIdGreaterThanEqualOrderById(Long id);
+
+
+
+
 }
