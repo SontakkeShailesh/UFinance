@@ -1,7 +1,5 @@
-About
-This project tracks income and expenses and provides a detailed history of both.
-It is built using Java, MySQL, Spring Boot, and Spring Data JPA. The entire codebase has been developed exclusively by Shailesh [me]
-and the source code is not available anywhere else.
+UFinance - Income and Expense Tracker
+A comprehensive application designed to track income and expenses, providing users with a detailed transaction history. This project was developed entirely by me, Shailesh, and is built using Java, MySQL, Spring Boot, and Spring Data JPA. The source code is proprietary and has not been published or made available elsewhere.
 
 ![image](https://github.com/user-attachments/assets/d3c520f5-0d78-4333-8273-27cc5afbfadd)
 
