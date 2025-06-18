@@ -1,6 +1,6 @@
 # UFinance - Income & Expense Tracker
 
-UFinance is a simple yet comprehensive web application designed to help users efficiently track their income and expenses. It offers detailed transaction history, real-time balance updates, and intuitive record management. This project was solely developed by me, Shailesh, using Java, Spring Boot, Spring Data JPA, and MySQL. The source code is proprietary and has not been published or shared publicly.
+UFinance is a simple yet comprehensive web application designed to help users efficiently track their income and expenses. It offers detailed transaction history, real-time balance updates, and intuitive record management. This project was solely developed by me, Shailesh, using Java, Spring Boot, Spring Data JPA, and MySQL.
 
 
 
